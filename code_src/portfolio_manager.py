@@ -27,7 +27,7 @@ class PortfolioManager:
         self.weights = None
         self.total_investment = None
 
-    def create_portfolio(self, total_investment: float = 10000, min_notation: float = 7.0, corresponding_assets: list = [], size: int = 5) -> Dict:
+    def create_portfolio(self, total_investment: float = 10000, min_notation: float = 1.0, corresponding_assets: list = [], size: int = 5) -> Dict:
         """
         Crée un portefeuille avec rebalancement hebdomadaire optimisé
         
@@ -35,44 +35,43 @@ class PortfolioManager:
             total_investment: Montant total à investir
             min_notation: Note minimale requise
             corresponding_assets: Liste des actifs à inclure dans le portefeuille
+            size: Nombre d'actifs à sélectionner
             
         Returns:
             Dict: Dictionnaire contenant les métriques et l'historique du portefeuille
         """
         try:
-
-            
             # Initialiser les DataFrames pour stocker les résultats
-            portfolio_returns = pd.DataFrame(index=self.returns_df.index)
-            portfolio_weights = pd.DataFrame(index=self.returns_df.index)
             portfolio_value = pd.DataFrame(index=self.returns_df.index)
             portfolio_value['value'] = total_investment
-            print(portfolio_value, portfolio_weights, portfolio_returns)
-            print("i")
+            
+            # Sélectionner les size actifs les mieux notés
+            asset_notes = {asset: self.notation_df[self.notation_df['Ticker'] == asset]['Note'].iloc[0] 
+                         for asset in corresponding_assets}
+            
+            # Trier les actifs par note et prendre les size premiers
+            sorted_assets = sorted(asset_notes.items(), key=lambda x: x[1], reverse=True)[:size]
+            selected_assets = [asset for asset, _ in sorted_assets]
+            
+            # Calculer les poids basés sur les notes des actifs sélectionnés
+            total_notes = sum(note for _, note in sorted_assets)
+            weights = {asset: note/total_notes for asset, note in sorted_assets}
 
-            # Pour chaque semaine, optimiser les poids
+            # Pour chaque semaine, calculer les rendements
             for i in range(len(self.returns_df)):
-                if i == 0:
-                    # Première semaine : pondération équipondérée
-                    current_weights = {asset: 1/size for asset in corresponding_assets} #faux
-                
-                
                 # Calculer le rendement du portefeuille pour cette semaine
                 weekly_return = 0
-                for asset, weight in current_weights.items():
-                    weekly_return += self.returns_df[f'{asset}_returns'].iloc[i] * weight
+                for asset, weight in weights.items():
+                    weekly_return += self.returns_df[asset].iloc[i] * weight
                 
                 # Mettre à jour la valeur du portefeuille
                 if i > 0:
                     portfolio_value.iloc[i] = portfolio_value.iloc[i-1] * (1 + weekly_return)
-                
-                # Stocker les poids et les rendements
-                portfolio_weights.iloc[i] = pd.Series(current_weights)
-                portfolio_returns.iloc[i] = weekly_return
-            
+
             # Calculer les métriques finales
-            annual_return = ((1 + portfolio_returns.mean()) ** 52 - 1) * 100
-            volatility = portfolio_returns.std() * np.sqrt(52) * 100
+            returns = portfolio_value['value'].pct_change().dropna()
+            annual_return = ((1 + returns.mean()) ** 52 - 1) * 100
+            volatility = returns.std() * np.sqrt(52) * 100
             sharpe_ratio = annual_return / volatility if volatility != 0 else 0
             
             return {
@@ -80,11 +79,12 @@ class PortfolioManager:
                 'volatility': volatility,
                 'sharpe_ratio': sharpe_ratio,
                 'portfolio_value': portfolio_value['value'],
-                'weights': portfolio_weights.iloc[-1].to_dict()  # Derniers poids utilisés
+                'weights': weights,  # Poids basés sur les notes
+                'selected_assets': selected_assets  # Liste des actifs sélectionnés
             }
             
         except Exception as e:
-            logger.error(f"Erreur lors de la création du portefeuille: {str(e)}")
+            logger.error(f"Erreur lors de la création du portefeuille : {str(e)}")
             raise
 
     def get_portfolio_metrics(self):
@@ -108,7 +108,7 @@ class PortfolioManager:
             # Note environnementale moyenne
             env_rating = 0
             for ticker, weight in self.weights.items():
-                asset_rating = self.assets_df[self.assets_df['Ticker'] == ticker]['Note_Environnementale'].iloc[0]
+                asset_rating = self.assets_df[self.assets_df['Ticker'] == ticker]['Note'].iloc[0]
                 env_rating += (weight / 100) * asset_rating
             
             return {
@@ -140,7 +140,7 @@ class PortfolioManager:
                     'Type': asset_data['Type'],
                     'Weight': weight,
                     'Investment': self.total_investment * (weight / 100),
-                    'Environmental Rating': asset_data['Note_Environnementale']
+                    'Environmental Rating': asset_data['']
                 })
             
             return pd.DataFrame(breakdown)

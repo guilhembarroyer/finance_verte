@@ -1,29 +1,37 @@
-# Simulateur de Portefeuille Vert
+# Finance Verte - Optimisation de Portefeuille
 
-Une application Streamlit pour simuler et optimiser des portefeuilles d'investissement avec une approche verte.
+Ce projet implémente une stratégie d'investissement vert optimisée, basée sur les notations environnementales des actifs et l'optimisation du ratio de Sharpe.
 
-## Fonctionnalités
+## Structure du Projet
 
-- Mise à jour automatique des données depuis Yahoo Finance
-- Filtrage des actifs selon leur note environnementale
-- Optimisation du portefeuille basée sur le ratio de Sharpe
-- Rebalancement hebdomadaire
-- Visualisation des performances et de la répartition du portefeuille
+```
+finance-verte/
+├── code_src/
+│   ├── data_collector.py    # Collecte des données de prix
+│   ├── portfolio_manager.py # Gestion et optimisation du portefeuille
+│   └── app.py              # Interface utilisateur Streamlit
+├── data/
+│   └── actifs.xlsx         # Données des actifs et leurs notations
+└── requirements.txt        # Dépendances Python
+```
 
 ## Installation
 
 1. Cloner le repository :
 ```bash
-git clone https://github.com/v/finance-verte.git
+git clone https://github.com/guilhembarroyer/finance-verte.git
 cd finance-verte
 ```
 
 2. Créer un environnement virtuel :
 ```bash
+# Sur macOS/Linux
 python -m venv venv
-source venv/bin/activate  # Sur Unix/macOS
-# ou
-venv\Scripts\activate  # Sur Windows
+source venv/bin/activate
+
+# Sur Windows
+python -m venv venv
+venv\Scripts\activate
 ```
 
 3. Installer les dépendances :
@@ -33,23 +41,34 @@ pip install -r requirements.txt
 
 ## Utilisation
 
-1. Lancer l'application :
+1. Mettre à jour les données des actifs :
 ```bash
-streamlit run app.py
+python code_src/data_collector.py
 ```
 
-2. Dans l'interface :
-   - Mettre à jour les données des actifs
-   - Définir le montant total à investir
-   - Choisir la note environnementale minimale
-   - Créer et visualiser le portefeuille
+2. Lancer l'application Streamlit :
+```bash
+streamlit run code_src/app.py
+```
 
-## Structure du Projet
+## Fonctionnalités
 
-- `app.py` : Application Streamlit principale
-- `portfolio_manager.py` : Gestion de la logique du portefeuille
-- `data_collector.py` : Récupération et mise à jour des données
-- `data/actifs.csv` : Données des actifs et leurs notes environnementales
+- Collecte automatique des données de prix depuis Yahoo Finance
+- Optimisation du portefeuille basée sur les notations environnementales
+- Interface utilisateur interactive avec Streamlit
+- Rebalancement hebdomadaire du portefeuille
+- Calcul des métriques de performance (rendement, volatilité, ratio de Sharpe)
+
+## Configuration
+
+Le fichier `data/univers_gestion_verte.xlsx` contient :
+- Les tickers des actifs
+- Les notations environnementales
+- Les métriques de performance
+
+## Contribution
+
+Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou une pull request.
 
 ## Dépendances
 

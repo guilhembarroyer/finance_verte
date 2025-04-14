@@ -33,7 +33,7 @@ if 'available_assets' not in st.session_state:
 if 'total_investment' not in st.session_state:
     st.session_state.total_investment = 10000
 if 'min_rating' not in st.session_state:
-    st.session_state.min_rating = 7.0
+    st.session_state.min_rating = 3.0
 if 'portfolio_size' not in st.session_state:
     st.session_state.portfolio_size = 5
 if 'corresponding_assets' not in st.session_state:
@@ -100,8 +100,8 @@ with st.sidebar:
     if st.session_state.notation_df is not None:
         st.session_state.min_rating = st.slider(
             "Note environnementale minimale",
-            min_value=float(st.session_state.notation_df['Note_Environnementale'].min()),
-            max_value=float(st.session_state.notation_df['Note_Environnementale'].max()),
+            min_value=float(st.session_state.notation_df['Note'].min()),
+            max_value=float(st.session_state.notation_df['Note'].max()),
             value=st.session_state.min_rating,
             step=0.1
         )
@@ -109,9 +109,9 @@ with st.sidebar:
 
         
         for asset in st.session_state.available_assets:     
-            if st.session_state.notation_df[st.session_state.notation_df['Ticker']==asset]['Note_Environnementale'].iloc[0]>= st.session_state.min_rating:
+            if st.session_state.notation_df[st.session_state.notation_df['Ticker']==asset]['Note'].iloc[0]>= st.session_state.min_rating:
                 st.session_state.corresponding_assets.append(asset)
-            print('ahha', st.session_state.corresponding_assets)
+            
 
 # Vérifier si des données sont disponibles
 if st.session_state.portfolio_manager is None:  
@@ -136,30 +136,34 @@ else:
                 )
                 
                 # Affichage des résultats
-                st.success("Portefeuille créé avec succès!")
-                
-                # Performance du portefeuille
-                st.subheader("Performance du portefeuille")
+                st.subheader("Résultats du portefeuille")
                 st.write(f"Rendement annuel: {portfolio['annual_return']:.2f}%")
                 st.write(f"Volatilité: {portfolio['volatility']:.2f}%")
                 st.write(f"Ratio de Sharpe: {portfolio['sharpe_ratio']:.2f}")
+                st.write(f"Valeur finale du portefeuille: {portfolio['portfolio_value'][-1]:.2f}€")
                 
+                # Création du diagramme camembert
+                weights_df = pd.DataFrame(list(portfolio['weights'].items()), columns=['Actif', 'Poids'])
+                fig = px.pie(weights_df, values='Poids', names='Actif', 
+                            title='Répartition du portefeuille',
+                            hole=0.3)  # Crée un donut chart
+                fig.update_traces(textposition='inside', textinfo='percent+label')
+                st.plotly_chart(fig)
+                
+                # Affichage des actifs sélectionnés
+                st.subheader("Actifs sélectionnés")
+                st.write("Les actifs suivants ont été sélectionnés pour le portefeuille :")
+                for asset in portfolio['selected_assets']:
+                    st.write(f"- {asset}")
+                
+
                 # Graphique de l'évolution du portefeuille
                 st.subheader("Évolution du portefeuille")
                 fig = px.line(portfolio['portfolio_value'], title="Valeur du portefeuille au fil du temps")
                 st.plotly_chart(fig)
-                
-                # Répartition du portefeuille
-                st.subheader("Répartition du portefeuille")
-                fig = px.pie(
-                    values=portfolio['weights'].values(),
-                    names=portfolio['weights'].keys(),
-                    title="Répartition des actifs"
-                )
-                st.plotly_chart(fig)
+  
                 
             except Exception as e:
                 st.error(f"Erreur lors de la création du portefeuille: {str(e)}")
 
         
-
