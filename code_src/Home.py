@@ -17,8 +17,18 @@ st.write("Contenu du dossier 'data' :", os.listdir("data"))
 
 # Lecture des données Excel
 try:
-
-    df = pd.read_excel('data/actifs.xlsx')
+    try: 
+        df = pd.read_excel('data/actifs.xlsx', engine="openpyxl")
+        st.success("✅ Fichier Excel chargé avec succès !")
+    except Exception as e:
+        st.error(f"❌ Erreur lors du chargement du fichier Excel1: {str(e)}")
+    try:
+        file_path = os.path.join("data", "actifs.xlsx")
+        df = pd.read_excel(file_path, engine="openpyxl")
+        st.success("✅ Fichier Excel chargé avec succès !")
+    except Exception as e:
+        st.error(f"❌ Erreur lors du chargement du fichier Excel2: {str(e)}")
+    
     st.subheader("Données des Actifs et Notes D&I")
     st.info("""
     Les notations D&I (Diversité et Inclusion) sont définies préalablement dans ce fichier Excel pour chaque actif.
