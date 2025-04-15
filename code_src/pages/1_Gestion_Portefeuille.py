@@ -3,8 +3,8 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-from portfolio_manager import PortfolioManager
-from data_collector import update_assets_data
+from modules.portfolio_manager import PortfolioManager
+from modules.data_collector import update_assets_data
 import logging
 
 # Configuration du logging
