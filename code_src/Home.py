@@ -11,16 +11,13 @@ st.set_page_config(
 # Titre principal
 st.title("🌱 Investir avec Impact : Notre Engagement pour la Diversité et l'Inclusion")
 
+
+st.write("Répertoire courant :", os.getcwd())
+st.write("Contenu du dossier 'data' :", os.listdir("data"))
+
 # Lecture des données Excel
 try:
 
-
-
-#    Chemin relatif sûr
-    file_path = os.path.join("data", "actifs.xlsx")
-
-    test_df = pd.read_excel(file_path)
-    st.dataframe(test_df, use_container_width=True)
     df = pd.read_excel('data/actifs.xlsx')
     st.subheader("Données des Actifs et Notes D&I")
     st.info("""
