@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import os
 
 st.set_page_config(
     page_title="Investir avec Impact",
@@ -12,8 +13,16 @@ st.title("🌱 Investir avec Impact : Notre Engagement pour la Diversité et l'I
 
 # Lecture des données Excel
 try:
+
+
+
+#    Chemin relatif sûr
+    file_path = os.path.join("data", "actifs.xlsx")
+
+    test_df = pd.read_excel(file_path)
+    st.dataframe(test_df, use_container_width=True)
     df = pd.read_excel('data/actifs.xlsx')
-    st.subheader("�� Données des Actifs et Notes D&I")
+    st.subheader("Données des Actifs et Notes D&I")
     st.info("""
     Les notations D&I (Diversité et Inclusion) sont définies préalablement dans ce fichier Excel pour chaque actif.
     Ces notes sont calculées selon notre méthodologie et prennent en compte tous les critères mentionnés ci-dessous.
