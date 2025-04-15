@@ -12,22 +12,16 @@ st.set_page_config(
 st.title("🌱 Investir avec Impact : Notre Engagement pour la Diversité et l'Inclusion")
 
 
-st.write("Répertoire courant :", os.getcwd())
-st.write("Contenu du dossier 'data' :", os.listdir("data"))
+#st.write("Répertoire courant :", os.getcwd())
+#st.write("Contenu du dossier 'data' :", os.listdir("data"))
 
 # Lecture des données Excel
 try:
-    try: 
-        df = pd.read_excel('data/actifs.xlsx', engine="openpyxl")
-        st.success("✅ Fichier Excel chargé avec succès !")
-    except Exception as e:
-        st.error(f"❌ Erreur lors du chargement du fichier Excel1: {str(e)}")
-    try:
-        file_path = os.path.join("data", "actifs.xlsx")
-        df = pd.read_excel(file_path, engine="openpyxl")
-        st.success("✅ Fichier Excel chargé avec succès !")
-    except Exception as e:
-        st.error(f"❌ Erreur lors du chargement du fichier Excel2: {str(e)}")
+
+    file_path = os.path.join("data", "actifs.xlsx")
+    df = pd.read_excel(file_path, engine="openpyxl")
+    st.success("✅ Fichier Excel chargé avec succès !")
+
     
     st.subheader("Données des Actifs et Notes D&I")
     st.info("""
