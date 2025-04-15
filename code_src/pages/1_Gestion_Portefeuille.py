@@ -44,13 +44,22 @@ if 'corresponding_assets' not in st.session_state:
 # Section pour la mise à jour des données
 st.header("Mise à jour des données")
 if st.button("Mettre à jour les données"):
-    with st.spinner("Mise à jour des données en cours..."):
+    with st.spinner("Mise à jour des données en cours... (1-2 minutes)"):
         try:
+            # Message d'information sur le temps d'attente
+            st.info("""
+            ⏱️ La mise à jour des données prend environ 1-2 minutes car nous devons :
+            - Télécharger les données historiques de chaque actif depuis Yahoo Finance
+            - Calculer les rendements hebdomadaires
+            
+            Veuillez patienter pendant le téléchargement...
+            """)
+            
             # Mise à jour des données
             notation_df, returns_df, available_assets = update_assets_data()
             
             if returns_df is not None and not returns_df.empty:
-                st.success("Données mises à jour avec succès!")
+                st.success("✅ Données mises à jour avec succès!")
                 
                 # Stocker les données dans la session
                 st.session_state.returns_df = returns_df
@@ -63,11 +72,10 @@ if st.button("Mettre à jour les données"):
                     returns_df=returns_df
                 )
                 
-                
             else:
-                st.error("Aucune donnée n'a pu être récupérée")
+                st.error("❌ Aucune donnée n'a pu être récupérée")
         except Exception as e:
-            st.error(f"Erreur lors de la mise à jour des données: {str(e)}")
+            st.error(f"❌ Erreur lors de la mise à jour des données: {str(e)}")
 
 
 # Afficher les statistiques des rendements
